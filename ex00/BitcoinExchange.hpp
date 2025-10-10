@@ -1,11 +1,12 @@
 #ifndef BITCOINEXCHANGE_HPP
 #define BITCOINEXCHANGE_HPP
+#include <exception>
+#include <algorithm> 
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <map>
 #include <cstdlib>
-#include <exception>
+#include <map>
 
 class BitcoinExchange {
     private:

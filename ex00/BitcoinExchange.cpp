@@ -10,12 +10,12 @@ void openFile(std::ifstream &file, const std::string &input) {
 }
 
 bool validateDate(const std::string &date) {
-    if (date.length() != 10 || date[4] != '-' || date[7] != '-')
+    if (date.size() != 10 || date[4] != '-' || date[7] != '-')
         return false;
     int y = std::atoi(date.substr(0, 4).c_str());
     int m = std::atoi(date.substr(5, 2).c_str());
     int d = std::atoi(date.substr(8, 2).c_str());
-    return (y >= 2000 && m >= 1 && m <= 12 && d >= 1 && d <= 31);
+    return (y >= 2000 && (m >= 1 && m <= 12) && (d >= 1 && d <= 31));
 }
 
 bool validateValue(const std::string &str, double &value) {
@@ -23,29 +23,51 @@ bool validateValue(const std::string &str, double &value) {
         return false;
     std::stringstream ss(str);
     ss >> value;
-    return (ss.fail() && value > 0 && value <= 1000);
+    return ((value > 0 && value <= 1000));
 }
 
 void BitcoinExchange::findBtcRate(const std::string &input) {
     std::ifstream file;
     openFile(file, input);
+    bool is_header = false;
 
     std::string line;
+
     while (std::getline(file, line)) {
         if (line.empty())
             continue;
+        if (!is_header) {
+            is_header = !is_header;
+            continue;
+        }
         std::stringstream ss(line);
         std::string date, pipe, value;
         ss >> date >> pipe >> value;
-        std::cout << "date: " << date << "  value: " << value << std::endl;
 
-        if (!validateDate(date)) {
-            std::cout << "Error: : bad input => " << date << std::endl; 
+        if (ss.fail() || pipe != "|" || !validateDate(date)) {
+            std::cout << "Error: : bad input => " << line << std::endl;
+            continue;
         }
+
         double in_value;
-        if (!validateValue(date, in_value)) {
-            std::cout << "Error: : bad input => " << date << std::endl; 
+        if (!validateValue(value, in_value)) {
+            if (in_value < 0)
+                std::cout << "Error: not a positive number.\n";
+            else
+                std::cout << "Error: too large a number.\n";
+            continue;
         }
+
+        std::map<std::string, double>::const_iterator it = _database.lower_bound(date);
+        if (it == _database.end() || it->first != date) {
+            if (it == _database.begin()) {
+                std::cout << "Error: no earlier date in database." << it->first << '\n';
+                continue;
+            }
+            --it;
+        }
+        double btc_rate = it->second * in_value;
+        std::cout << date << " => " << value << " = "<< btc_rate << std::endl;
     }
 }
 
