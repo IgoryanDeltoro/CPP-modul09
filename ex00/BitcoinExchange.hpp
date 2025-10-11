@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <cstdlib>
+#include <cctype>
 #include <map>
 
 class BitcoinExchange {
@@ -23,7 +24,5 @@ class BitcoinExchange {
         void getDataFromDB(const std::string &input);
 
 };
-
-std::ostream& operator<<(std::ostream &os, BitcoinExchange &btc);
 
 #endif 
