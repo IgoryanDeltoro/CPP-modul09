@@ -12,7 +12,6 @@ void BitcoinExchange::findBtcRate(const std::string &input) {
     std::ifstream file;
     openFile(file, input);
     bool is_header = false;
-
     std::string line;
 
     while (std::getline(file, line)) {
@@ -58,16 +57,22 @@ void BitcoinExchange::findBtcRate(const std::string &input) {
     }
 }
 
+void validateLine(const std::string &line) {
+    if (line.empty())
+        throw std::runtime_error("Error: database has wrong data.");
+}
+
 void BitcoinExchange::getDataFromDB(const std::string &input) {
     std::ifstream file;
     openFile(file, input);
 
     std::string line;
     std::getline(file, line);
+    validateLine(line);
     while (std::getline(file, line)) {
+        validateLine(line);
         std::stringstream ss(line);
         std::string date, value;
-
         if (std::getline(ss, date, ',') && std::getline(ss, value))
             _database[date] = std::atof(value.c_str());
         if (line[10] != ',' || !validateDate(date) || !isDigit(value, '.'))
