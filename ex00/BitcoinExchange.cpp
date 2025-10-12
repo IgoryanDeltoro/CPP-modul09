@@ -68,9 +68,8 @@ void BitcoinExchange::getDataFromDB(const std::string &input) {
         std::stringstream ss(line);
         std::string date, value;
 
-        if (std::getline(ss, date, ',') && std::getline(ss, value)) {
+        if (std::getline(ss, date, ',') && std::getline(ss, value))
             _database[date] = std::atof(value.c_str());
-        }
         if (line[10] != ',' || !validateDate(date) || !isDigit(value, '.'))
             throw std::runtime_error("Error: database has wrong data.");
     }
@@ -94,13 +93,22 @@ void openFile(std::ifstream &file, const std::string &input) {
         throw std::logic_error("Error: Unable to open " + input);
 }
 
+bool isLeapYear(int year) {
+    return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+}
+
 bool validateDate(const std::string &date) {
     if (date.size() != 10 || date[4] != '-' || date[7] != '-' || !isDigit(date, '-'))
         return false;
     int y = std::atoi(date.substr(0, 4).c_str());
     int m = std::atoi(date.substr(5, 2).c_str());
     int d = std::atoi(date.substr(8, 2).c_str());
-    return (y >= 2000 && (m >= 1 && m <= 12) && (d >= 1 && d <= 31));
+
+    int daysInMonth[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+    if (isLeapYear(y)) 
+        daysInMonth[1] = 29;
+
+    return (y >= 2000 && (m >= 1 && m <= 12) && (d >= 1 && d <= daysInMonth[m - 1]));
 }
 
 bool validateValue(const std::string &str, double &value) {
