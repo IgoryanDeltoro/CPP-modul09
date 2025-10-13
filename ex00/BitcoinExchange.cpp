@@ -7,6 +7,7 @@ bool isDigit(const std::string &str, char exeption);
 void openFile(std::ifstream &file, const std::string &input);
 bool validateDate(const std::string &date);
 bool validateValue(const std::string &str, double &value);
+void trim(std::string &input);
 
 void BitcoinExchange::findBtcRate(const std::string &input) {
     std::ifstream file;
@@ -17,15 +18,19 @@ void BitcoinExchange::findBtcRate(const std::string &input) {
     while (std::getline(file, line)) {
         if (line.empty())
             continue;
+        std::stringstream ss(line);
+        std::string date, delim, value, extra;
+        ss >> date >> delim >> value >> extra;
+
         if (!is_header) {
-            is_header = !is_header;
+            if (date == "date" && delim == "|" && value == "value")
+                is_header = !is_header;
+            else
+                throw std::runtime_error("Error: Invalid header in the imput file.");
             continue;
         }
-        std::stringstream ss(line);
-        std::string date, pipe, value;
-        ss >> date >> pipe >> value;
 
-        if (ss.fail() || pipe != "|" || !validateDate(date)) {
+        if (!extra.empty() || delim != "|" || !validateDate(date)) {
             std::cout << "Error: bad input => " << line << std::endl;
             continue;
         }
@@ -68,8 +73,11 @@ void BitcoinExchange::getDataFromDB(const std::string &input) {
 
     std::string line;
     std::getline(file, line);
-    validateLine(line);
+    trim(line);
+    if (line != "date,exchange_rate")
+        throw std::runtime_error("Error: database has wrong data.");
     while (std::getline(file, line)) {
+        trim(line);
         validateLine(line);
         std::stringstream ss(line);
         std::string date, value;
@@ -119,7 +127,22 @@ bool validateDate(const std::string &date) {
 bool validateValue(const std::string &str, double &value) {
     if (str.empty())
         return false;
+    std::size_t p = str.find(".");
     std::stringstream ss(str);
     ss >> value;
-    return ((value > 0 && value <= 1000));
+    return ((value > 0 && value <= 1000) && str.length() - p <= 13);
+}
+
+void trim(std::string &str) {
+    std::string::iterator start = str.begin(), stop = str.end();
+    while (start != stop && (*start == 32 || *start == 9)) ++start;
+    if (start == stop) {
+        str.clear();
+    } else {
+        while (start != --stop && (*stop == 32 || *stop == 9)) ; 
+        ++stop;
+
+        str.erase(stop, str.end());
+        str.erase(str.begin(), start);
+    }
 }

@@ -52,6 +52,10 @@
         "typeinfo": "cpp",
         "variant": "cpp",
         "sstream": "cpp",
-        "map": "cpp"
+        "map": "cpp",
+        "cstring": "cpp",
+        "complex": "cpp",
+        "ranges": "cpp",
+        "cinttypes": "cpp"
     }
 }

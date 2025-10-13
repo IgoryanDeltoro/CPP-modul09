@@ -22,7 +22,6 @@ class BitcoinExchange {
 
         void findBtcRate(const std::string &input);
         void getDataFromDB(const std::string &input);
-
 };
 
 #endif 
