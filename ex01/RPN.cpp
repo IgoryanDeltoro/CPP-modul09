@@ -28,7 +28,7 @@ size_t getLength(std::string str) {
     return str.length();
 }
 
-bool isRightOperatorsNum(const std::string &str) {
+bool isRightOperatorNum(const std::string &str) {
     std::stringstream ss(str);
     std::string token;
     int operators = 0;
@@ -44,7 +44,7 @@ bool isRightOperatorsNum(const std::string &str) {
 }
 
 void RPN::calculateRPN(const std::string &rpn) {
-    if (rpn.empty() || !isRightOperatorsNum(rpn))
+    if (rpn.empty() || !isRightOperatorNum(rpn))
         throw std::runtime_error("Error: incorrect numbers of operators.");
 
     std::stringstream ss(rpn);
@@ -53,7 +53,7 @@ void RPN::calculateRPN(const std::string &rpn) {
     while (ss >> token) {
         char* pEnd = NULL;
         int d = static_cast<int>(std::strtod(token.c_str(), &pEnd));
-        if (d < -9 || d > 9)
+        if (d > 9)
             throw std::runtime_error("Error: Typed element < " + token + " > should be less then 10.");
         if (!isOperator(token) && getLength(pEnd)) {
             throw std::runtime_error(("Error: Incorrect digit < " + token + " >"));
