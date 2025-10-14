@@ -3,50 +3,72 @@
 RPN::RPN() {}
 RPN::~RPN() {}
 
-int handleCanculation(int f, int s, int oper) {
+int handleCanculation(int f, int l, int oper) {
     switch (oper)
     {
     case 43:
-        return f + s;   
+        return f + l;   
     case 45:
-        return f - s;
+        return f - l;
     case 47:
-        return f / s; 
+        return f / l; 
     case 42:
-        return f * s;
-    default:
-        return -1;
-        break;
+        return f * l;
     }
-    return -1;
+    return 0;
+}
+
+bool isOperator(std::string oper) {
+    if (oper == "+" || oper == "-" || oper == "*" ||oper == "/")
+        return true;
+    return false;
+}
+
+size_t getLength(std::string str) {
+    return str.length();
+}
+
+bool isRightOperatorsNum(const std::string &str) {
+    std::stringstream ss(str);
+    std::string token;
+    int operators = 0;
+    int digits = 0;
+
+    while (ss >> token) {
+        if (isOperator(token))
+            operators++;
+        else
+            digits++; 
+    }
+    return ((digits - operators) == 1);
 }
 
 void RPN::calculateRPN(const std::string &rpn) {
-    if (rpn.empty())
-        return;
-    
-    for (size_t i = 0; i < rpn.size(); i++) {
-        if (!std::strchr("0123456789+-*/ ", rpn[i]))
-            throw std::runtime_error("Error: incorrect element was found.");
-        if (std::isdigit(rpn[i])) {
-            int d = rpn[i] - 48;
-            if (d < 0 || d > 9) {
-                throw std::runtime_error("Error: incorrect integer.");
-            }
-            _digit.push_back(d);
-        } else {
-            if (rpn[i] == 32 || rpn[i] == 9) continue;
-            int first, last;
-            first = _digit.front();
-            last = _digit.back();
-            if (_digit.size() != 2)
-                throw std::runtime_error("Error: There is an extra operator.");
+    if (rpn.empty() || !isRightOperatorsNum(rpn))
+        throw std::runtime_error("Error: incorrect numbers of operators.");
 
-            int result = handleCanculation(first, last, rpn[i]);
-            _digit.pop_front();
-            _digit.pop_back();
-            _digit.push_back(result);
+    std::stringstream ss(rpn);
+    std::string token;
+
+    while (ss >> token) {
+        char* pEnd = NULL;
+        int d = static_cast<int>(std::strtod(token.c_str(), &pEnd));
+        if (d < -9 || d > 9)
+            throw std::runtime_error("Error: Typed element < " + token + " > should be less then 10.");
+        if (!isOperator(token) && getLength(pEnd)) {
+            throw std::runtime_error(("Error: Incorrect digit < " + token + " >"));
+        }
+            
+        if (!isOperator(token)) {
+            _digit.push(d);
+        } else {
+            int first = _digit.top();
+            _digit.pop();
+            int last = _digit.top();
+            _digit.pop();
+            int result = handleCanculation(last, first, token[0]);
+            _digit.push(result);
         }
     }
-    std::cout << _digit.front() << std::endl;
+    std::cout << _digit.top() << std::endl;
 }

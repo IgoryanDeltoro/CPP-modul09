@@ -1,13 +1,14 @@
 #ifndef RPN_HPP
 #define RPN_HPP
 #include <iostream>
-#include <list>
+#include <sstream>
+#include <stack>
 #include <cstdlib>
 #include <cstring>
 
 class RPN {
     private:
-        std::list<int> _digit;
+        std::stack<int> _digit;
 
         RPN(const RPN &other);
         RPN &operator=(const RPN &other);
