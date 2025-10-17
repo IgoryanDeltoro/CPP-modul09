@@ -6,7 +6,7 @@ size_t getLength(std::string str) {
 
 int main(int ac, char **av) {
     if (ac == 1) {
-        std::cerr << "Error: Enter  ./pmergeme 7 4 8 2 9\n";
+        std::cerr << "Error: Enter  ./PmergeMe 7 4 8 2 9\n";
         return 1;
     }
 
@@ -16,8 +16,8 @@ int main(int ac, char **av) {
     for (size_t i = 1; i < ac; i++) {
         char *pEnd;
         int n = static_cast<int>(std::strtod(av[i], &pEnd));
-        if (getLength(pEnd) || n < INT_MIN || n > INT_MAX) {
-            std::cerr << "Error: Incorect number foud. \n";
+        if (!av[i][0] || getLength(pEnd) || n < 0|| n > INT_MAX) {
+            std::cerr << "Error: Invalid number detected. \n";
             v_arr.clear();
             d_arr.clear();
             return 1;
@@ -29,15 +29,19 @@ int main(int ac, char **av) {
     std::cout << "\n=========== sort test by vector container\n\n";
     PmergeMe<int, std::vector> v;
     v.insertNumbersArray(v_arr.begin(), v_arr.end());
-    v.mergeInsertionSort();
-    v.displayArray();
+    v.displayUnsortedNumbers();
+    v.mergeInsertionSorting();
+    v.displaySortedNumbers();
+    v.displaySortingTime();
+
 
     std::cout << "\n=========== sort test by deque container\n\n";
     PmergeMe<int, std::deque> d;
     d.insertNumbersArray(d_arr.begin(), d_arr.end());
-    d.mergeInsertionSort();
-    d.displayArray();
-
+    d.displayUnsortedNumbers();
+    d.mergeInsertionSorting();
+    d.displaySortedNumbers();
+    d.displaySortingTime();
 
     return 0;
 }

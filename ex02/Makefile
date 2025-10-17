@@ -1,10 +1,10 @@
-TARGET := pmergeme
+TARGET := PmergeMe
 CXX := c++
 STD := -std=c++98
 BUILD := build
 CFLAGS := -Wall -Wextra -Werror $(STD)
 RM := rm -rf
-SRC := main.cpp PmergeMe.cpp
+SRC := main.cpp
 OBJ := $(SRC:%.cpp=$(BUILD)/%.o)
 DEPS := $(OBJ:%.o=%.d)
 all: $(TARGET)
