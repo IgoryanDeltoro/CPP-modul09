@@ -47,42 +47,62 @@ void PmergeMe<T, Container>::insertNumbersArray(Iterator b, Iterator e) {
 }
 
 template <typename T, template < typename, typename > class Container>
-void bineryInsertion(Container<T, std::allocator<T>> &arr, T &value) {
-    typename Container<T, std::allocator<T>>::iterator p;
-    p = std::lower_bound(arr.begin(), arr.end(), value);
-    arr.insert(p, value);
+int binarySearch(Container<T, std::allocator<T>> &arr, T &value, int low, int high) {
+    if (high <= low)
+        return (value > arr[low]) ? low + 1 : low;
+        
+    int mid = (low + high) / 2;
+
+    if (value == arr[mid])
+        return (mid + 1);
+    
+    if (value > arr[mid])
+        return binarySearch(arr, value, mid + 1, high);
+    
+    return binarySearch(arr, value, low, mid - 1);
 }
 
 template <typename T, template < typename, typename > class Container>
 void fordJohnsonSort(Container<T, std::allocator<T>> &arr) {
     size_t num = arr.size();
-    if (num <= 1) return;
+    if (num <= 2) return;
     
-    Container<T, std::allocator<T>> small;
-    Container<T, std::allocator<T>> larg;
-
-    for (size_t f = 0; (f + 1) < num; f += 2) {
-        int s = f + 1;
-        if (arr[f] > arr[s]) {
-            small.push_back(arr[s]);
-            larg.push_back(arr[f]);
-        } else {
-            small.push_back(arr[f]);
-            larg.push_back(arr[s]);
+    Container<std::pair<T, T>, std::allocator<std::pair<T, T>>> pairs;
+    for (size_t i = 0; (i + 1) < num; i += 2) {
+        if (arr[i] > arr[i + 1])
+            pairs.push_back(std::make_pair(arr[i + 1], arr[i]));
+        else
+            pairs.push_back(std::make_pair(arr[i], arr[i + 1]));
+    }
+    
+    for (size_t s = 1; s < pairs.size(); ++s) {
+        std::pair<T, T> key = pairs[s];
+        int f = s - 1;
+        while (f >= 0 && pairs[f].second > key.second) {
+            pairs[f + 1] = pairs[f];
+            f--;
         }
+        pairs[f + 1] = key;
+    }
+
+    Container<T, std::allocator<T>> main, pendings;
+    typename Container<std::pair<T, T>, std::allocator<std::pair<T, T>>>::iterator it = pairs.begin();
+    for (; it != pairs.end(); ++it) {
+        pendings.push_back(it->first);
+        main.push_back(it->second);
     }
 
     if (num % 2 != 0) {
-        small.push_back(arr[num - 1]);
+        pendings.push_back(arr[num - 1]);
     }
 
-    fordJohnsonSort(larg);
-
-    for (size_t i = 0; i < small.size(); i++) {
-        bineryInsertion(larg, small[i]);
+    for (size_t i = 0; i < pendings.size(); ++i) {
+        T selected = pendings[i];
+        int pos = binarySearch(main, selected, 0, main.size() - 1);
+        main.insert(main.begin() + pos, selected);
     }
-    
-    arr = larg;
+
+    arr.swap(main);
 }
 
 template <typename T, template < typename, typename > class Container>
