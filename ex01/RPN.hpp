@@ -5,6 +5,7 @@
 #include <stack>
 #include <cstdlib>
 #include <cstring>
+#include <climits>
 
 class RPN {
     private:

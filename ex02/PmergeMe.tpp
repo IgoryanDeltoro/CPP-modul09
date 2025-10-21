@@ -9,35 +9,33 @@ template <typename T, template <typename, typename> class Container>
 PmergeMe<T, Container>::~PmergeMe() {}
 
 template <typename T, template <typename, typename> class Container>
-void PmergeMe<T, Container>::displayUnsortedNumbers() {
+void PmergeMe<T, Container>::displayData(bool flag) {
     if (!_data.size())
         throw std::runtime_error("Error: There is no any data to display.");
     typename Container<T, std::allocator<T>>::iterator it = _data.begin();
-    std::cout << "Before:   ";
+    std::cout << (flag ? GREEN : YELLOW);
+    std::cout << (flag ? "After" : "Before") << ":   ";
     for (; it != _data.end(); ++it) {
         std::cout << *it << " ";
     }
-    std::cout << std::endl;
-}
-
-template <typename T, template <typename, typename> class Container>
-void PmergeMe<T, Container>::displaySortedNumbers() {
-    if (!_data.size())
-        throw std::runtime_error("Error: There is no any data to display.");
-    typename Container<T, std::allocator<T>>::iterator it = _data.begin();
-    std::cout << "After:   ";
-    for (; it != _data.end(); ++it) {
-        std::cout << *it << " ";
-    }
-    std::cout << std::endl;
+    std::cout << RESET << std::endl;
 }
 
 template <typename T, template<typename, typename> class Container>
 void PmergeMe<T, Container>::displaySortingTime() {
-    std::cout << "Time to process a range of " << _data.size();
-    std::cout << " elements with : " << std::fixed 
-    << _sortTime << std::setprecision(5);
-    std::cout << " sec " << std::endl;
+    std::string container_name = typeid(Container<T, std::allocator<T>>).name();
+    size_t b = -1;
+    if ((b = container_name.find("vector")) != std::string::npos)
+        container_name = "std::vector<int>";
+    else if (container_name.find("vector"))
+        container_name = "std::deque<int>";
+    else 
+        container_name = "std::unknown_container";
+
+    std::cout << MAGENTA << "Time to process a range of " << _data.size();
+    std::cout << " elements with " << container_name
+    << ": " << std::fixed << _sortTime << std::setprecision(5);
+    std::cout << " us " << RESET << std::endl;
 }
 
 template <typename T, template <typename, typename> class Container>
@@ -86,7 +84,8 @@ void fordJohnsonSort(Container<T, std::allocator<T>> &arr) {
     }
 
     Container<T, std::allocator<T>> main, pendings;
-    typename Container<std::pair<T, T>, std::allocator<std::pair<T, T>>>::iterator it = pairs.begin();
+    typename Container<std::pair<T, T>, std::allocator<std::pair<T, T>>>::iterator it;
+    it = pairs.begin();
     for (; it != pairs.end(); ++it) {
         pendings.push_back(it->first);
         main.push_back(it->second);
@@ -106,14 +105,13 @@ void fordJohnsonSort(Container<T, std::allocator<T>> &arr) {
 }
 
 template <typename T, template < typename, typename > class Container>
-void PmergeMe<T, Container>::mergeInsertionSorting() {
+void PmergeMe<T, Container>::mergeInsertionSort() {
     clock_t start, end;
 
     start = clock();
     fordJohnsonSort(_data);
     end = clock();
     _sortTime = double(end - start) / double(CLOCKS_PER_SEC);
-
 }
 
 #endif

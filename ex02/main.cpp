@@ -29,18 +29,18 @@ int main(int ac, char **av) {
     std::cout << "\n=========== sort test by vector container\n\n";
     PmergeMe<int, std::vector> v;
     v.insertNumbersArray(v_arr.begin(), v_arr.end());
-    v.displayUnsortedNumbers();
-    v.mergeInsertionSorting();
-    v.displaySortedNumbers();
+    v.displayData(); //default parameter is false to show  messege on "Before"
+    v.mergeInsertionSort(); // call fanction to sort numbers
+    v.displayData(true); // pass true as parameter to swich messege on "After"
     v.displaySortingTime();
 
 
     std::cout << "\n=========== sort test by deque container\n\n";
     PmergeMe<int, std::deque> d;
     d.insertNumbersArray(d_arr.begin(), d_arr.end());
-    d.displayUnsortedNumbers();
-    d.mergeInsertionSorting();
-    d.displaySortedNumbers();
+    d.displayData(); //default parameter is false to show  messege on "Before"
+    d.mergeInsertionSort(); // call fanction to sort numbers
+    d.displayData(true); // pass true as parameter to swich messege on "After"
     d.displaySortingTime();
 
     return 0;

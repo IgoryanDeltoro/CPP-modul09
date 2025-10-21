@@ -1,5 +1,11 @@
 #ifndef PMERGEME_HPP
 #define PMERGEME_HPP
+# define RED "\e[31m"
+# define GREEN "\e[32m"
+# define YELLOW "\e[33m"
+# define BLUE "\e[34m"
+# define MAGENTA "\e[35m"
+# define RESET "\e[0m"
 #include <iostream>
 #include <sstream>
 #include <climits>
@@ -24,9 +30,8 @@ template <typename T, template <typename, typename> class Container> class Pmerg
 
         template <typename Iterator>
         void insertNumbersArray(Iterator b, Iterator e);
-        void mergeInsertionSorting();
-        void displayUnsortedNumbers();
-        void displaySortedNumbers();
+        void mergeInsertionSort();
+        void displayData(bool flag = false);
         void displaySortingTime();
 };
 
