@@ -3,7 +3,7 @@
 RPN::RPN() {}
 RPN::~RPN() {}
 
-int handleCanculation(int f, int l, int oper) {
+long handleCanculation(long f, long l, long oper) {
     switch (oper)
     {
     case 43:
@@ -52,7 +52,7 @@ void RPN::calculateRPN(const std::string &rpn) {
 
     while (ss >> token) {
         char* pEnd = NULL;
-        int d = static_cast<int>(std::strtod(token.c_str(), &pEnd));
+        long d = static_cast<long>(std::strtod(token.c_str(), &pEnd));
         if (d < -9 && d > 9)
             throw std::runtime_error("Error: Typed element < " + token + " > should be less then 10.");
         if (!isOperator(token) && getLength(pEnd)) {
@@ -62,13 +62,14 @@ void RPN::calculateRPN(const std::string &rpn) {
         if (!isOperator(token)) {
             _digit.push(d);
         } else {
-            int first = _digit.top();
+            long first = _digit.top();
             _digit.pop();
-            int last = _digit.top();
+            long last = _digit.top();
             _digit.pop();
             long result = handleCanculation(last, first, token[0]);
+            std::cout << result << std::endl;
             if (result > INT_MAX)
-                throw std::runtime_error(("Error: the end of result is more the integer can store"));
+                throw std::runtime_error(("Error: The sum of result is more than integer can store"));
             _digit.push(result);
         }
     }

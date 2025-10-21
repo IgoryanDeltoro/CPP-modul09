@@ -66,13 +66,20 @@ void fordJohnsonSort(Container<T, std::allocator<T>> &arr) {
     if (num <= 2) return;
     
     Container<std::pair<T, T>, std::allocator<std::pair<T, T>>> pairs;
+    std::cout << "\nSwap the larger and smaller ones\n";
     for (size_t i = 0; (i + 1) < num; i += 2) {
-        if (arr[i] > arr[i + 1])
+        std::cout << "[" << arr[i] << "," << arr[i + 1] << "] ==> ";
+
+        if (arr[i] > arr[i + 1]) {
             pairs.push_back(std::make_pair(arr[i + 1], arr[i]));
-        else
+            std::cout << "[" << arr[i + 1] << "," << arr[i] << "] \n";  
+        } else {
             pairs.push_back(std::make_pair(arr[i], arr[i + 1]));
+            std::cout << "[" << arr[i] << "," << arr[i + 1] << "] \n";
+        }
     }
-    
+
+    std::cout << "\nSorted by larger pairs\n";
     for (size_t s = 1; s < pairs.size(); ++s) {
         std::pair<T, T> key = pairs[s];
         int f = s - 1;
@@ -83,22 +90,44 @@ void fordJohnsonSort(Container<T, std::allocator<T>> &arr) {
         pairs[f + 1] = key;
     }
 
+    for (size_t i = 0; i < pairs.size(); i++){
+        std::cout << "[" << pairs[i].first << "," << pairs[i].second << "] \n";
+    }
+    std::cout << "\n";
+
+
     Container<T, std::allocator<T>> main, pendings;
     typename Container<std::pair<T, T>, std::allocator<std::pair<T, T>>>::iterator it;
+    std::cout << "\nDevided each pair on main and pending chains\n";
     it = pairs.begin();
     for (; it != pairs.end(); ++it) {
         pendings.push_back(it->first);
         main.push_back(it->second);
     }
+    std::cout << "mainChain: \n";
+    for (size_t i = 0; i < main.size(); i++){
+        std::cout << main[i] << " ";
+    }
+    std::cout << "\n";
+    std::cout << "pendingsChain: \n";
+    for (size_t i = 0; i < pendings.size(); i++){
+        std::cout << pendings[i] << " ";
+    }
+    std::cout << "\n\n";
 
     if (num % 2 != 0) {
         pendings.push_back(arr[num - 1]);
     }
 
+    std::cout << "binary searching position: \n";
     for (size_t i = 0; i < pendings.size(); ++i) {
         T selected = pendings[i];
         int pos = binarySearch(main, selected, 0, main.size() - 1);
         main.insert(main.begin() + pos, selected);
+        std::cout  << "pos: " << pos << " element: " << selected << " ==> ";
+        for (size_t i = 0; i < main.size(); i++)
+            std::cout << main[i] << ",";
+        std::cout << std::endl;
     }
 
     arr.swap(main);

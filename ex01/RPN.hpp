@@ -3,13 +3,14 @@
 #include <iostream>
 #include <sstream>
 #include <stack>
+#include <list>
 #include <cstdlib>
 #include <cstring>
 #include <climits>
 
 class RPN {
     private:
-        std::stack<int> _digit;
+        std::stack<long, std::list<long> > _digit;
 
         RPN(const RPN &other);
         RPN &operator=(const RPN &other);

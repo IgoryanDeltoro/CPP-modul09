@@ -35,13 +35,13 @@ int main(int ac, char **av) {
     v.displaySortingTime();
 
 
-    std::cout << "\n=========== sort test by deque container\n\n";
-    PmergeMe<int, std::deque> d;
-    d.insertNumbersArray(d_arr.begin(), d_arr.end());
-    d.displayData(); //default parameter is false to show  messege on "Before"
-    d.mergeInsertionSort(); // call fanction to sort numbers
-    d.displayData(true); // pass true as parameter to swich messege on "After"
-    d.displaySortingTime();
+    // std::cout << "\n=========== sort test by deque container\n\n";
+    // PmergeMe<int, std::deque> d;
+    // d.insertNumbersArray(d_arr.begin(), d_arr.end());
+    // d.displayData(); //default parameter is false to show  messege on "Before"
+    // d.mergeInsertionSort(); // call fanction to sort numbers
+    // d.displayData(true); // pass true as parameter to swich messege on "After"
+    // d.displaySortingTime();
 
     return 0;
 }

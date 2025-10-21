@@ -14,7 +14,6 @@
 #include <ctime>
 #include <iomanip>
 #include <utility>
-#include <map>
 
 template <typename T, template <typename, typename> class Container> class PmergeMe {
     private:
