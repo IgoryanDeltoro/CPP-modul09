@@ -6,7 +6,7 @@ STD := -std=c++98
 
 BUILD := build
 
-CXXFLAGS := -Wall -Wextra -Werror $(STD)
+CXXFLAGS := -Wall -Wextra -Werror $(STD) 
 
 RM := rm -rf
 
@@ -16,19 +16,27 @@ OBJ := $(SRC:%.cpp=$(BUILD)/%.o)
 
 DEPS := $(OBJ:%.o=%.d)
 
+# Default build type: release
+MODE ?= release
+
+# === MODE CONFIG ===
+ifeq ($(MODE),debug)
+    CXXFLAGS += -DDEBUG=1
+endif
+
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
 	$(CXX) $(CXXFLAGS) $(OBJ) -o $(TARGET)
 
 $(BUILD)/%.o: %.cpp
-	mkdir -p $(BUILD)
+	mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -MMD -MP -c $< -o $@
 
 debug:
-	$(MAKE) CXXFLAGS="$(CXXFLAGS) -g -D DEBUG=1"
+	$(MAKE) CXXFLAGS="$(CXXFLAGS) -DDEBUG=1" all
 
-clear:
+clean:
 	$(RM) $(BUILD)
 
 fclean: clean

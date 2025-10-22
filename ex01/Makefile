@@ -11,7 +11,7 @@ all: $(TARGET)
 $(TARGET): $(OBJ)
 	$(CXX) $(CXXFLAGS) $(OBJ) -o $(TARGET)
 $(BUILD)/%.o: %.cpp
-	mkdir -p $(BUILD)
+	mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -MMD -MP -c $< -o $@
 clean:
 	$(RM) $(BUILD)

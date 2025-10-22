@@ -1,6 +1,10 @@
 #ifndef PMERGEME_HPP
 #define PMERGEME_HPP
 
+# ifndef DEBUG
+# define DEBUG false
+# endif
+
 # define RED "\e[31m"
 # define GREEN "\e[32m"
 # define YELLOW "\e[33m"
@@ -43,7 +47,7 @@ template <typename T, template <typename, typename> class Container> class Pmerg
         void mergeInsertionSort();
         void displayData();
         void displaySortingTime();
-        void debugMode(bool flag);
+        void debugMode(bool flag = true);
 };
 
 #include "PmergeMe.tpp"

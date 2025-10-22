@@ -1,10 +1,8 @@
-#ifndef PMERGEME_TPP
-#define PMERGEME_TPP
 #include "PmergeMe.hpp"
 
 // Default constractor 
 template <typename T, template <typename, typename> class Container>
-PmergeMe<T, Container>::PmergeMe() : _sortTime(0), _sorted(false), _debug(false) {}
+PmergeMe<T, Container>::PmergeMe() : _sortTime(0), _sorted(false), _debug(DEBUG) {}
 
 // The parameterized constructor accepts an array of numbers with its lenth.
 template <typename T, template <typename, typename> class Container>
@@ -17,12 +15,12 @@ PmergeMe<T, Container>::PmergeMe(T *arr, int len) {
     }
     _sortTime = 0; 
     _sorted = false;
-    _debug = false;
+    _debug = DEBUG;
 }
 
 // The parameterized constructor accepts a container of numbers.
 template <typename T, template <typename, typename> class Container>
-PmergeMe<T, Container>::PmergeMe(Container<T, std::allocator<T> > &arr) : _data(arr), _sortTime(0), _sorted(false), _debug(false) {}
+PmergeMe<T, Container>::PmergeMe(Container<T, std::allocator<T> > &arr) : _data(arr), _sortTime(0), _sorted(false), _debug(DEBUG) {}
 
 // The Destructor
 template <typename T, template <typename, typename> class Container>
@@ -37,7 +35,7 @@ void PmergeMe<T, Container>::displayData() {
     std::cout << (_sorted ? GREEN : YELLOW);
     std::cout << (_sorted ? "After" : "Before") << ":   ";
     for (; it != _data.end(); ++it) {
-        std::cout << *it << " ";
+        std::cout << *it << ",";
     }
     std::cout << RESET << std::endl;
 }
@@ -61,7 +59,7 @@ void PmergeMe<T, Container>::displaySortingTime() {
     std::cout << MAGENTA << "Time to process a range of " << _data.size();
     std::cout << " elements with " << container_name
     << ": " << std::fixed << _sortTime << std::setprecision(5);
-    std::cout << " us " << RESET << std::endl;
+    std::cout << " us " << RESET << "\n\n";
 }
 
 // Insertin array 
@@ -123,7 +121,6 @@ void PmergeMe<T, Container>::fordJohnsonSort(Container<T, std::allocator<T> > &a
     }
     std::cout << (_debug ? "\n" : "");
 
-
     Container<T, std::allocator<T> > main, pendings;
     typename Container<std::pair<T, T>, std::allocator<std::pair<T, T> > >::iterator it;
     std::cout << (_debug ? "\nDevided each pair on main and pending chains\n" : "");
@@ -135,12 +132,12 @@ void PmergeMe<T, Container>::fordJohnsonSort(Container<T, std::allocator<T> > &a
 
     std::cout << (_debug ? "mainChain: \n" : "");
     for (size_t i = 0; _debug && i < main.size(); i++){
-        std::cout << main[i] << " ";
+        std::cout << main[i] << ",";
     }
     std::cout << (_debug ? "\n" : "");
     std::cout << (_debug ? "pendingsChain: \n" : "");
     for (size_t i = 0; _debug && i < pendings.size(); i++){
-        std::cout << pendings[i] << " ";
+        std::cout << pendings[i] << ",";
     }
     std::cout << (_debug ? "\n\n" : "");
 
@@ -178,5 +175,3 @@ template <typename T, template < typename, typename > class Container>
 void PmergeMe<T, Container>::debugMode(bool flag) {
     _debug = flag;
 }
-
-#endif
