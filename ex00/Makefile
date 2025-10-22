@@ -2,17 +2,17 @@ TARGET := btc
 CXX = c++
 STD := -std=c++98
 BUILD := ./build
-FLAGS := -Wall -Wextra -Werror $(STD)
+CXXFLAGS := -Wall -Wextra -Werror $(STD)
 RM := rm -fr
 SRC := main.cpp BitcoinExchange.cpp
 OBJ := $(SRC:%.cpp=$(BUILD)/%.o)
 DEPS := $(OBJ:%.o=%.d)
 all: $(TARGET)
 $(TARGET): $(OBJ)
-	$(CXX) $(FLAGS) $(OBJ) -o $(TARGET)
+	$(CXX) $(CXXFLAGS) $(OBJ) -o $(TARGET)
 $(BUILD)/%.o: %.cpp
 	mkdir -p $(dir $@)
-	$(CXX) $(FLAGS) -MMD -MP -c $< -o $@
+	$(CXX) $(CXXFLAGS) -MMD -MP -c $< -o $@
 clean:
 	$(RM) $(BUILD)
 fclean: clean

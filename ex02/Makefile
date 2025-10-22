@@ -1,22 +1,41 @@
 TARGET := PmergeMe
+
 CXX := c++
+
 STD := -std=c++98
+
 BUILD := build
-CFLAGS := -Wall -Wextra -Werror $(STD)
+
+CXXFLAGS := -Wall -Wextra -Werror $(STD)
+
 RM := rm -rf
+
 SRC := main.cpp
+
 OBJ := $(SRC:%.cpp=$(BUILD)/%.o)
+
 DEPS := $(OBJ:%.o=%.d)
+
 all: $(TARGET)
+
 $(TARGET): $(OBJ)
-	$(CXX) $(FLAGS) $(OBJ) -o $(TARGET)
+	$(CXX) $(CXXFLAGS) $(OBJ) -o $(TARGET)
+
 $(BUILD)/%.o: %.cpp
 	mkdir -p $(BUILD)
-	$(CXX) $(FLAGS) -MMD -MP -c $< -o $@
+	$(CXX) $(CXXFLAGS) -MMD -MP -c $< -o $@
+
+debug:
+	$(MAKE) CXXFLAGS="$(CXXFLAGS) -g -D DEBUG=1"
+
 clear:
 	$(RM) $(BUILD)
+
 fclean: clean
 	$(RM) $(TARGET)
+
 re: fclean all
-.PHONY: all clean fclean re
+
+.PHONY: all clean fclean re debug
+
 -include $(DEPS)

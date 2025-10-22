@@ -3,7 +3,7 @@
 
 int main(int ac, char **av) {
     if (ac != 2) {
-        std::cerr << "Error: enter - ./bitcoinexchange ./inputFileOfDataBase\n";
+        std::cerr << "Error: Enter => ./btc inputFile\n";
         return 1;
     }
     try

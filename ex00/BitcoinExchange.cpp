@@ -16,8 +16,11 @@ void BitcoinExchange::findBtcRate(const std::string &input) {
     std::string line;
 
     while (std::getline(file, line)) {
-        if (line.empty())
+        if (line.empty()) {
+            std::cout << "Error: bad input => empty line\n";
             continue;
+        }
+
         std::stringstream ss(line);
         std::string date, delim, value, extra;
         ss >> date >> delim >> value >> extra;
@@ -121,7 +124,7 @@ bool validateDate(const std::string &date) {
     if (isLeapYear(y)) 
         daysInMonth[1] = 29;
 
-    return (y >= 2000 && (m >= 1 && m <= 12) && (d >= 1 && d <= daysInMonth[m - 1]));
+    return (y >= 2009 && (m >= 1 && m <= 12) && (d >= 1 && d <= daysInMonth[m - 1]));
 }
 
 bool validateValue(const std::string &str, double &value) {

@@ -53,7 +53,7 @@ void RPN::calculateRPN(const std::string &rpn) {
     while (ss >> token) {
         char* pEnd = NULL;
         long d = static_cast<long>(std::strtod(token.c_str(), &pEnd));
-        if (d < -9 && d > 9)
+        if (d < -9 || d > 9)
             throw std::runtime_error("Error: Typed element < " + token + " > should be less then 10.");
         if (!isOperator(token) && getLength(pEnd)) {
             throw std::runtime_error(("Error: Incorrect digit < " + token + " >"));
@@ -62,12 +62,11 @@ void RPN::calculateRPN(const std::string &rpn) {
         if (!isOperator(token)) {
             _digit.push(d);
         } else {
-            long first = _digit.top();
-            _digit.pop();
             long last = _digit.top();
             _digit.pop();
-            long result = handleCanculation(last, first, token[0]);
-            std::cout << result << std::endl;
+            long first = _digit.top();
+            _digit.pop();
+            long result = handleCanculation(first, last, token[0]);
             if (result > INT_MAX)
                 throw std::runtime_error(("Error: The sum of result is more than integer can store"));
             _digit.push(result);
