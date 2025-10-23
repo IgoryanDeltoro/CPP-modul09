@@ -66,7 +66,12 @@ void RPN::calculateRPN(const std::string &rpn) {
             _digit.pop();
             long first = _digit.top();
             _digit.pop();
+
+            if (last == 0 || first == 0)
+                throw std::runtime_error(("Error: Given number can't be devided by zero "));
+
             long result = handleCanculation(first, last, token[0]);
+            
             if (result > INT_MAX)
                 throw std::runtime_error(("Error: The sum of result is more than integer can store"));
             _digit.push(result);

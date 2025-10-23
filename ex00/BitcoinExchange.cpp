@@ -40,7 +40,9 @@ void BitcoinExchange::findBtcRate(const std::string &input) {
 
         double in_value;
         if (!validateValue(value, in_value)) {
-            if (in_value < 0)
+            if (value[0] == '.' || value[value.length() -1] == '.')
+                std::cout << "Error: wrong value \"" << value << "\".\n";
+            else if (in_value < 0)
                 std::cout << "Error: not a positive number.\n";
             else
                 std::cout << "Error: too large a number.\n";
@@ -94,7 +96,7 @@ void BitcoinExchange::getDataFromDB(const std::string &input) {
 bool isDigit(const std::string &str, char exeption) {
     if (str.empty())
         return false;
-    for (size_t i = 0; i < str.length(); i++) {
+    for (size_t i = 0; i + 1 < str.length(); i++) {
         if (exeption != 48 && exeption == str[i])
             continue;
         if (!std::isdigit(str[i]))
@@ -116,24 +118,45 @@ bool isLeapYear(int year) {
 bool validateDate(const std::string &date) {
     if (date.size() != 10 || date[4] != '-' || date[7] != '-' || !isDigit(date, '-'))
         return false;
+
+    time_t t = time(NULL);
+    tm *now = localtime(&t);
+
+    int curr_y = now->tm_year + 1900;
+    int curr_m = now->tm_mon + 1;
+    int curr_d = now->tm_mday;
+
     int y = std::atoi(date.substr(0, 4).c_str());
     int m = std::atoi(date.substr(5, 2).c_str());
     int d = std::atoi(date.substr(8, 2).c_str());
-
+    
     int daysInMonth[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
     if (isLeapYear(y)) 
         daysInMonth[1] = 29;
 
-    return (y >= 2009 && (m >= 1 && m <= 12) && (d >= 1 && d <= daysInMonth[m - 1]));
+    bool isVY = !(y > curr_y);
+    bool isVM = !(y == curr_y && m > curr_m);
+    bool isVD = !(y == curr_y && m == curr_m && d > curr_d);
+
+    return ((y >= 2009 && isVY) && ((m >= 1 && m <= 12) && isVM) && ((d >= 1 && d <= daysInMonth[m - 1]) && isVD));
 }
 
 bool validateValue(const std::string &str, double &value) {
     if (str.empty())
         return false;
-    std::size_t p = str.find(".");
+
+    bool dotSeen = false;
+    for (size_t i = 0; i < str.size(); ++i) {
+        if (str[i] == '.') {
+            if (i == 0 || !isdigit(str[i + 1])) return false; 
+            if (dotSeen) return false; 
+            dotSeen = false;
+        }
+    }
+
     std::stringstream ss(str);
     ss >> value;
-    return ((value > 0 && value <= 1000) && str.length() - p <= 13);
+    return ((value > 0 && value <= 1000));
 }
 
 void trim(std::string &str) {
