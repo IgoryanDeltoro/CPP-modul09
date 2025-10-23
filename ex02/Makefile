@@ -16,10 +16,8 @@ OBJ := $(SRC:%.cpp=$(BUILD)/%.o)
 
 DEPS := $(OBJ:%.o=%.d)
 
-# Default build type: release
 MODE ?= release
 
-# === MODE CONFIG ===
 ifeq ($(MODE),debug)
     CXXFLAGS += -DDEBUG=1
 endif

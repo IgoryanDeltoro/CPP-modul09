@@ -86,11 +86,13 @@ int PmergeMe<T, Container>::binarySearch(Container<T, std::allocator<T> > &arr, 
     return binarySearch(arr, value, low, mid - 1);
 }
 
+// Ford Jonhnson sort algorithm with debug mode
 template <typename T, template < typename, typename > class Container>
 void PmergeMe<T, Container>::fordJohnsonSort(Container<T, std::allocator<T> > &arr) {
     size_t num = arr.size();
     if (num <= 1) return;
     
+    // spliting into pairs with a swaping
     Container<std::pair<T, T>, std::allocator<std::pair<T, T> > > pairs;
     if (_debug) std::cout << "\nSwap the larger and smaller ones\n";
     for (size_t i = 0; (i + 1) < num; i += 2) {
@@ -105,6 +107,7 @@ void PmergeMe<T, Container>::fordJohnsonSort(Container<T, std::allocator<T> > &a
         }
     }
 
+    // sorting by inserting pairs of larger numbers 
     if (_debug) std::cout << "\nSorted by larger pairs\n";
     for (size_t s = 1; s < pairs.size(); ++s) {
         std::pair<T, T> key = pairs[s];
@@ -121,6 +124,7 @@ void PmergeMe<T, Container>::fordJohnsonSort(Container<T, std::allocator<T> > &a
     }
     std::cout << (_debug ? "\n" : "");
 
+    // Spliting pairs on main and pending chain
     Container<T, std::allocator<T> > main, pendings;
     typename Container<std::pair<T, T>, std::allocator<std::pair<T, T> > >::iterator it;
     std::cout << (_debug ? "\nDevided each pair on main and pending chains\n" : "");
@@ -141,10 +145,12 @@ void PmergeMe<T, Container>::fordJohnsonSort(Container<T, std::allocator<T> > &a
     }
     std::cout << (_debug ? "\n\n" : "");
 
+    // Adding add number to the and of pending
     if (num % 2 != 0) {
         pendings.push_back(arr[num - 1]);
     }
 
+    // Binary merge inserting sort  
     std::cout << (_debug ? "binary searching position: \n" : "");
     for (size_t i = 0; i < pendings.size(); ++i) {
         T selected = pendings[i];
