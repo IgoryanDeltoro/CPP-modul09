@@ -156,7 +156,7 @@ bool validateValue(const std::string &str, double &value) {
 
     std::stringstream ss(str);
     ss >> value;
-    return ((value > 0 && value <= 1000));
+    return ((value >= 0 && value <= 1000));
 }
 
 void trim(std::string &str) {

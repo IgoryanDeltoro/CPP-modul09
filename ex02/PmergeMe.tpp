@@ -2,7 +2,7 @@
 
 // Default constractor 
 template <typename T, template <typename, typename> class Container>
-PmergeMe<T, Container>::PmergeMe() : _sortTime(0), _sorted(false), _debug(DEBUG) {}
+PmergeMe<T, Container>::PmergeMe() : _comparison_number(0), _sortTime(0), _sorted(false), _debug(DEBUG) {}
 
 // The parameterized constructor accepts an array of numbers with its lenth.
 template <typename T, template <typename, typename> class Container>
@@ -13,6 +13,7 @@ PmergeMe<T, Container>::PmergeMe(T *arr, int len) {
             throw std::runtime_error("Error: Invalid number detected.");
         _data.push_back(n);
     }
+    _comparison_number = 0;
     _sortTime = 0; 
     _sorted = false;
     _debug = DEBUG;
@@ -20,7 +21,11 @@ PmergeMe<T, Container>::PmergeMe(T *arr, int len) {
 
 // The parameterized constructor accepts a container of numbers.
 template <typename T, template <typename, typename> class Container>
-PmergeMe<T, Container>::PmergeMe(Container<T, std::allocator<T> > &arr) : _data(arr), _sortTime(0), _sorted(false), _debug(DEBUG) {}
+PmergeMe<T, Container>::PmergeMe(Container<T, std::allocator<T> > &arr) :   _data(arr), 
+                                                                            _comparison_number(0), 
+                                                                            _sortTime(0), 
+                                                                            _sorted(false), 
+                                                                            _debug(DEBUG) {}
 
 // The Destructor
 template <typename T, template <typename, typename> class Container>
@@ -72,17 +77,24 @@ void PmergeMe<T, Container>::insertNumbersArray(Iterator b, Iterator e) {
 // Binary search
 template <typename T, template < typename, typename > class Container>
 int PmergeMe<T, Container>::binarySearch(Container<T, std::allocator<T> > &arr, T &value, int low, int high) {
-    if (high <= low)
-        return (value > arr[low]) ? low + 1 : low;
+    if (high <= low) {
+        _comparison_number++;
+        if (value > arr[low]) return low + 1;
+        else return low;
+    }
         
     int mid = (low + high) / 2;
 
-    if (value == arr[mid])
+    if (value == arr[mid]) {
+        _comparison_number++;
         return (mid + 1);
+    }
     
-    if (value > arr[mid])
+    if (value > arr[mid]) {
+        _comparison_number++;
         return binarySearch(arr, value, mid + 1, high);
-    
+    }
+
     return binarySearch(arr, value, low, mid - 1);
 }
 
@@ -94,7 +106,7 @@ void PmergeMe<T, Container>::fordJohnsonSort(Container<T, std::allocator<T> > &a
     
     // spliting into pairs with a swaping
     Container<std::pair<T, T>, std::allocator<std::pair<T, T> > > pairs;
-    if (_debug) std::cout << "\nSwap the larger and smaller ones\n";
+    if (_debug) std::cout << "\nPairing and swapping\n";
     for (size_t i = 0; (i + 1) < num; i += 2) {
         if (_debug) std::cout << "[" << arr[i] << "," << arr[i + 1] << "] ==> ";
 
@@ -108,7 +120,7 @@ void PmergeMe<T, Container>::fordJohnsonSort(Container<T, std::allocator<T> > &a
     }
 
     // sorting by inserting pairs of larger numbers 
-    if (_debug) std::cout << "\nSorted by larger pairs\n";
+    if (_debug) std::cout << "\nSorting by the larger element of each pair\n";
     for (size_t s = 1; s < pairs.size(); ++s) {
         std::pair<T, T> key = pairs[s];
         int f = s - 1;
@@ -124,10 +136,10 @@ void PmergeMe<T, Container>::fordJohnsonSort(Container<T, std::allocator<T> > &a
     }
     std::cout << (_debug ? "\n" : "");
 
-    // Spliting pairs on main and pending chain
+    // Spliting pairs into main and pending chain
     Container<T, std::allocator<T> > main, pendings;
     typename Container<std::pair<T, T>, std::allocator<std::pair<T, T> > >::iterator it;
-    std::cout << (_debug ? "\nDevided each pair on main and pending chains\n" : "");
+    std::cout << (_debug ? "\nDevided each pair into main and pending chains\n" : "");
     it = pairs.begin();
     for (; it != pairs.end(); ++it) {
         pendings.push_back(it->first);
@@ -156,7 +168,7 @@ void PmergeMe<T, Container>::fordJohnsonSort(Container<T, std::allocator<T> > &a
         T selected = pendings[i];
         int pos = binarySearch(main, selected, 0, main.size() - 1);
         main.insert(main.begin() + pos, selected);
-        if (_debug)std::cout  << "pos: " << pos << " element: " << selected << " ==> ";
+        if (_debug)std::cout  << "element: " << selected << " pos: " << pos << " ==> ";
         for (size_t i = 0; _debug && i < main.size(); i++)
             std::cout << main[i] << ",";
         std::cout << (_debug ? "\n" : "");
@@ -175,6 +187,7 @@ void PmergeMe<T, Container>::mergeInsertionSort() {
     _sortTime = double(end - start) / double(CLOCKS_PER_SEC);
     if (_data.size() != 1)
         _sorted = true;
+    if (_debug) std::cout << "Number of comparisons are => " << _comparison_number << std::endl;
 }
 
 template <typename T, template < typename, typename > class Container>

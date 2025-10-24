@@ -45,7 +45,7 @@ bool isRightOperatorNum(const std::string &str) {
 
 void RPN::calculateRPN(const std::string &rpn) {
     if (rpn.empty() || !isRightOperatorNum(rpn))
-        throw std::runtime_error("Error: incorrect numbers of operators.");
+        throw std::runtime_error("Error: invalid operators.");
 
     std::stringstream ss(rpn);
     std::string token;
@@ -54,7 +54,7 @@ void RPN::calculateRPN(const std::string &rpn) {
         char* pEnd = NULL;
         long d = static_cast<long>(std::strtod(token.c_str(), &pEnd));
         if (d < -9 || d > 9)
-            throw std::runtime_error("Error: Typed element < " + token + " > should be less then 10.");
+            throw std::runtime_error("Error: Typed element < " + token + " > should be in range form -9 to 9.");
         if (!isOperator(token) && getLength(pEnd)) {
             throw std::runtime_error(("Error: Incorrect digit < " + token + " >"));
         }
@@ -62,13 +62,15 @@ void RPN::calculateRPN(const std::string &rpn) {
         if (!isOperator(token)) {
             _digit.push(d);
         } else {
+            if (_digit.size() < 2)
+                throw std::runtime_error(("Error: Invalid order"));
             long last = _digit.top();
             _digit.pop();
             long first = _digit.top();
             _digit.pop();
 
-            if (last == 0 || first == 0)
-                throw std::runtime_error(("Error: Given number can't be devided by zero "));
+            if (token == "/" && (last == 0 || first == 0))
+                throw std::runtime_error(("Error: Given number can't be devided by zero"));
 
             long result = handleCanculation(first, last, token[0]);
             

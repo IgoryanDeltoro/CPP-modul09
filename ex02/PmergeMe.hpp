@@ -25,10 +25,11 @@
 
 template <typename T, template <typename, typename> class Container> class PmergeMe {
     private:
-        Container<T, std::allocator<T> > _data;
-        double  _sortTime;
-        bool    _sorted;
-        bool     _debug;
+        Container<T, std::allocator<T> >    _data;
+        int                                 _comparison_number;
+        double                              _sortTime;
+        bool                                _sorted;
+        bool                                _debug;
 
         PmergeMe(const PmergeMe &other);
         PmergeMe &operator=(const PmergeMe &other);
