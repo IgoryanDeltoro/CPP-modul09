@@ -18,15 +18,17 @@ int main(int ac, char **av) {
 
     for (size_t i = 1; i < static_cast<size_t>(ac); i++) {
         char *pEnd;
-        int n = static_cast<int>(std::strtod(av[i], &pEnd));
-        if (!av[i][0] || getLength(pEnd) || n < 0 || n > INT_MAX) {
+        std::string s = av[i];
+        double n = (std::strtod(s.c_str(), &pEnd));
+        std::size_t found = s.find(".");
+        if (!s[0] || getLength(pEnd) || found != std::string::npos || n < 0 || n > INT_MAX) {
             std::cerr << "Error: Invalid number detected. \n";
             v_arr.clear();
             d_arr.clear();
             return 1;
         }
-        v_arr.push_back(n);
-        d_arr.push_back(n);
+        v_arr.push_back(static_cast<int>(n));
+        d_arr.push_back(static_cast<int>(n));
     }
 
     {

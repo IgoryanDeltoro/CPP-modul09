@@ -6,7 +6,7 @@ BitcoinExchange::~BitcoinExchange() {}
 bool isDigit(const std::string &str, char exeption);
 void openFile(std::ifstream &file, const std::string &input);
 bool validateDate(const std::string &date);
-bool validateValue(const std::string &str, double &value);
+bool validateValue(const std::string &str, bool isDB);
 void trim(std::string &input);
 
 void BitcoinExchange::findBtcRate(const std::string &input) {
@@ -17,7 +17,7 @@ void BitcoinExchange::findBtcRate(const std::string &input) {
 
     while (std::getline(file, line)) {
         if (line.empty()) {
-            std::cout << "Error: bad input => empty line\n";
+            std::cout << "Error: bad input => empty line" << std::endl;
             continue;
         }
 
@@ -26,10 +26,10 @@ void BitcoinExchange::findBtcRate(const std::string &input) {
         ss >> date >> delim >> value >> extra;
 
         if (!is_header) {
-            if (date == "date" && delim == "|" && value == "value")
+            if (date == "date" && delim == "|" && value == "value" && extra.empty())
                 is_header = !is_header;
             else
-                throw std::runtime_error("Error: Invalid header in the imput file.");
+                throw std::runtime_error("Error: Invalid header in the input file.");
             continue;
         }
 
@@ -38,26 +38,36 @@ void BitcoinExchange::findBtcRate(const std::string &input) {
             continue;
         }
 
-        double in_value;
-        if (!validateValue(value, in_value)) {
-            if (value[0] == '.' || value[value.length() -1] == '.')
-                std::cout << "Error: wrong value \"" << value << "\".\n";
-            else if (in_value < 0)
-                std::cout << "Error: not a positive number.\n";
-            else
-                std::cout << "Error: too large a number.\n";
+        if (value.empty()) {
+            std::cout << "Error: bad input => value is empty." << std::endl;
+            continue;
+        }
+
+        if (!validateValue(value, true)) {
+            std::cout << "Error: bad input => " << value << std::endl;
+            continue;
+        }
+
+        double in_value = std::strtod(value.c_str(), NULL);
+        if (in_value < 0) {
+            std::cout << "Error: not a positive number." << std::endl;
+            continue;
+        }
+
+        if (in_value > 1000) {
+            std::cout << "Error: too large a number." << std::endl;
             continue;
         }
 
         if(!isDigit(value, '.')) {
-            std::cout << "Error: wrong value \"" << value << "\".\n";
+            std::cout << "Error: wrong value " << value << std::endl;
             continue;
         }
 
         std::map<std::string, double>::const_iterator it = _database.lower_bound(date);
         if (it == _database.end() || it->first != date) {
             if (it == _database.begin()) {
-                std::cout << "Error: no earlier date in database." << it->first << '\n';
+                std::cout << "Error: no earlier date in database " << it->first << std::endl;
                 continue;
             }
             --it;
@@ -65,6 +75,8 @@ void BitcoinExchange::findBtcRate(const std::string &input) {
         double btc_rate = it->second * in_value;
         std::cout << date << " => " << value << " = "<< btc_rate << std::endl;
     }
+    if (!is_header)
+        throw std::runtime_error("Error: Invalid header in the input file.");
 }
 
 void validateLine(const std::string &line) {
@@ -88,9 +100,11 @@ void BitcoinExchange::getDataFromDB(const std::string &input) {
         std::string date, value;
         if (std::getline(ss, date, ',') && std::getline(ss, value))
             _database[date] = std::atof(value.c_str());
-        if (line[10] != ',' || !validateDate(date) || !isDigit(value, '.'))
+        if (line[10] != ',' || !validateDate(date) || !isDigit(value, '.') || !validateValue(value, false))
             throw std::runtime_error("Error: database has wrong data.");
     }
+    if (_database.empty())
+        throw std::runtime_error("Error: database has wrong data.");
 }
 
 bool isDigit(const std::string &str, char exeption) {
@@ -141,22 +155,28 @@ bool validateDate(const std::string &date) {
     return ((y >= 2009 && isVY) && ((m >= 1 && m <= 12) && isVM) && ((d >= 1 && d <= daysInMonth[m - 1]) && isVD));
 }
 
-bool validateValue(const std::string &str, double &value) {
-    if (str.empty())
-        return false;
-
+bool validateValue(const std::string &str, bool isDB) {
     bool dotSeen = false;
+    if (str[0] == '.' || str[str.length() -1] == '.')
+        return false;
     for (size_t i = 0; i < str.size(); ++i) {
         if (str[i] == '.') {
             if (i == 0 || !isdigit(str[i + 1])) return false; 
             if (dotSeen) return false; 
-            dotSeen = false;
+            dotSeen = true;
         }
     }
-
-    std::stringstream ss(str);
-    ss >> value;
-    return ((value >= 0 && value <= 1000));
+    if (isDB && str.find("1000") == 0) {
+        size_t dotPos = str.find('.');
+        if (dotPos != std::string::npos) {
+            for (size_t i = dotPos + 1; i < str.size(); ++i) {
+                if (str[i] != '0') {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
 }
 
 void trim(std::string &str) {
