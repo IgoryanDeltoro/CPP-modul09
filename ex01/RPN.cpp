@@ -40,7 +40,7 @@ bool isRightOperatorNum(const std::string &str) {
         else
             digits++; 
     }
-    return ((digits - operators) == 1);
+    return ((digits - operators) == 1 && digits > 1);
 }
 
 void RPN::calculateRPN(const std::string &rpn) {
@@ -55,7 +55,7 @@ void RPN::calculateRPN(const std::string &rpn) {
         long d = static_cast<long>(std::strtod(token.c_str(), &pEnd));
         if (d < -9 || d > 9)
             throw std::runtime_error("Error: Typed element < " + token + " > should be in range form -9 to 9.");
-        if (!isOperator(token) && getLength(pEnd)) {
+        if ((!isOperator(token) && getLength(pEnd)) || (token.find(".") != std::string::npos)) {
             throw std::runtime_error(("Error: Incorrect digit < " + token + " >"));
         }
             
@@ -79,5 +79,6 @@ void RPN::calculateRPN(const std::string &rpn) {
             _digit.push(result);
         }
     }
+
     std::cout << _digit.top() << std::endl;
 }

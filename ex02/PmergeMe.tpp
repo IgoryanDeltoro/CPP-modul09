@@ -67,7 +67,7 @@ void PmergeMe<T, Container>::displaySortingTime() {
     std::cout << " us " << RESET << "\n\n";
 }
 
-// Insertin array 
+// ---------- Insertin array -------- 
 template <typename T, template <typename, typename> class Container>
 template <typename Iterator>
 void PmergeMe<T, Container>::insertNumbersArray(Iterator b, Iterator e) {
@@ -86,7 +86,6 @@ int PmergeMe<T, Container>::binarySearch(Container<T, std::allocator<T> >& arr, 
 
     if (value == arr[mid])
         return mid + 1;
-
     else if (value > arr[mid])
         return binarySearch(arr, value, mid + 1, high);
     else
@@ -109,6 +108,33 @@ std::vector<size_t> generateJacobsthalSequence(size_t n) {
         j1 = next;
     }
     return seq;
+}
+
+// --- Step 4: Insert pendings using Jacobsthal order ---
+template <typename T, template <typename, typename> class Container>
+void PmergeMe<T, Container>::handleJucobsthalRecurciveAlgorithm(Container<T, std::allocator<T> > &main, Container<T, std::allocator<T> > &pend) {
+    if (pend.size() < 1)
+        return ;
+    std::vector<size_t> jacobSeq = generateJacobsthalSequence(pend.size());
+
+    if (_debug) std::cout << "Inserting in Jacobsthal order:\n";
+    for (size_t j = 0; j < jacobSeq.size(); ++j) {
+        size_t idx = (jacobSeq[j] < jacobSeq.size()) ? jacobSeq[j] - 1 : j;
+        if (idx >= pend.size()) continue;
+
+        T selected = pend[idx];
+        int pos = binarySearch(main, selected, 0, main.size() - 1);
+        main.insert(main.begin() + pos, selected);
+        pend.erase(pend.begin() + idx);
+
+        if (_debug) {
+            std::cout << "insert pendings[" << idx + 1 << " - 1]=" << selected
+                << " at pos " << pos << " => ";
+            for (size_t k = 0; k < main.size(); k++) std::cout << main[k] << ",";
+            std::cout << "\n";
+        }
+    }
+    handleJucobsthalRecurciveAlgorithm(main, pend);
 }
 
 // -------- Ford–Johnson Sort --------
@@ -171,38 +197,8 @@ void PmergeMe<T, Container>::fordJohnsonSort(Container<T, std::allocator<T> >& a
         std::cout << "\n\n";
     }
 
-    // --- Step 4: Insert pendings using Jacobsthal order ---
-    std::vector<size_t> jacobSeq = generateJacobsthalSequence(pendingsChain.size());
-    std::vector<bool> inserted(pendingsChain.size(), false);
-
-    if (_debug) std::cout << "Inserting in Jacobsthal order:\n";
-    for (size_t j = 0; j < jacobSeq.size(); ++j) {
-        size_t idx = jacobSeq[j] - 1;
-        if (idx >= pendingsChain.size()) continue;
-        if (inserted[idx]) continue;
-
-        T selected = pendingsChain[idx];
-        int pos = binarySearch(mainChain, selected, 0, mainChain.size() - 1);
-        mainChain.insert(mainChain.begin() + pos, selected);
-        inserted[idx] = true;
-
-        if (_debug) {
-            std::cout << "insert pendings[" << idx << "]=" << selected
-                << " at pos " << pos << " => ";
-            for (size_t k = 0; k < mainChain.size(); k++) std::cout << mainChain[k] << ",";
-            std::cout << "\n";
-        }
-    }
-
-    // Insert remaining elements not covered by Jacobsthal
-    for (size_t i = 0; i < pendingsChain.size(); ++i) {
-        if (!inserted[i]) {
-            T selected = pendingsChain[i];
-            int pos = binarySearch(mainChain, selected, 0, mainChain.size() - 1);
-            mainChain.insert(mainChain.begin() + pos, selected);
-            inserted[i] = true;
-        }
-    }
+    // --- Step 4: Call recurcive Insert pendings using Jacobsthal order ---
+    handleJucobsthalRecurciveAlgorithm(mainChain, pendingsChain);
 
     arr.swap(mainChain);
 }

@@ -36,6 +36,7 @@ template <typename T, template <typename, typename> class Container> class Pmerg
 
         void fordJohnsonSort(Container<T, std::allocator<T> > &arr);
         int binarySearch(Container<T, std::allocator<T> > &arr, T &value, int low, int high);
+        void handleJucobsthalRecurciveAlgorithm(Container<T, std::allocator<T> > &main, Container<T, std::allocator<T> > &pend);
 
     public:
         PmergeMe();
