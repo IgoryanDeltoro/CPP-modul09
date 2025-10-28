@@ -74,107 +74,137 @@ void PmergeMe<T, Container>::insertNumbersArray(Iterator b, Iterator e) {
     _data.insert(_data.end(), b, e);
 }
 
-// Binary search
-template <typename T, template < typename, typename > class Container>
-int PmergeMe<T, Container>::binarySearch(Container<T, std::allocator<T> > &arr, T &value, int low, int high) {
+ // -------- Binary Search --------
+template <typename T, template <typename, typename> class Container>
+int PmergeMe<T, Container>::binarySearch(Container<T, std::allocator<T> >& arr, T& value, int low, int high) {
     if (high <= low) {
         _comparison_number++;
-        if (value > arr[low]) return low + 1;
-        else return low;
+        return (value > arr[low]) ? low + 1 : low;
     }
-        
     int mid = (low + high) / 2;
+    _comparison_number++;
 
-    if (value == arr[mid]) {
-        _comparison_number++;
-        return (mid + 1);
-    }
-    
-    if (value > arr[mid]) {
-        _comparison_number++;
+    if (value == arr[mid])
+        return mid + 1;
+
+    else if (value > arr[mid])
         return binarySearch(arr, value, mid + 1, high);
-    }
-
-    return binarySearch(arr, value, low, mid - 1);
+    else
+        return binarySearch(arr, value, low, mid - 1);
 }
 
-// Ford Jonhnson sort algorithm with debug mode
-template <typename T, template < typename, typename > class Container>
-void PmergeMe<T, Container>::fordJohnsonSort(Container<T, std::allocator<T> > &arr) {
+// -------- Generate Jacobsthal Sequence --------
+std::vector<size_t> generateJacobsthalSequence(size_t n) {
+    std::vector<size_t> seq;
+    if (n == 0) return seq;
+
+    size_t j0 = 0, j1 = 1;
+    seq.push_back(1);
+    while (true) {
+        size_t next = j1 + 2 * j0;
+        if (next > n)
+            break;
+        seq.push_back(next);
+        j0 = j1;
+        j1 = next;
+    }
+    return seq;
+}
+
+// -------- Ford–Johnson Sort --------
+template <typename T, template <typename, typename> class Container>
+void PmergeMe<T, Container>::fordJohnsonSort(Container<T, std::allocator<T> >& arr) {
     size_t num = arr.size();
     if (num <= 1) return;
-    
-    // spliting into pairs with a swaping
+
+    // --- Step 1: Pairing and swapping ---
     Container<std::pair<T, T>, std::allocator<std::pair<T, T> > > pairs;
     if (_debug) std::cout << "\nPairing and swapping\n";
     for (size_t i = 0; (i + 1) < num; i += 2) {
         if (_debug) std::cout << "[" << arr[i] << "," << arr[i + 1] << "] ==> ";
-
         if (arr[i] > arr[i + 1]) {
+            _comparison_number++;
             pairs.push_back(std::make_pair(arr[i + 1], arr[i]));
-            if (_debug) std::cout << "[" << arr[i + 1] << "," << arr[i] << "] \n";  
+            if (_debug) std::cout << "[" << arr[i + 1] << "," << arr[i] << "] \n";
         } else {
+            _comparison_number++;
             pairs.push_back(std::make_pair(arr[i], arr[i + 1]));
             if (_debug) std::cout << "[" << arr[i] << "," << arr[i + 1] << "] \n";
         }
     }
 
-    // sorting by inserting pairs of larger numbers 
-    if (_debug) std::cout << "\nSorting by the larger element of each pair\n";
+    // --- Step 2: Sort pairs by larger element ---
+    if (_debug) std::cout << "\nSorting by larger elements:\n";
     for (size_t s = 1; s < pairs.size(); ++s) {
         std::pair<T, T> key = pairs[s];
         int f = s - 1;
         while (f >= 0 && pairs[f].second > key.second) {
+            _comparison_number++;
             pairs[f + 1] = pairs[f];
             f--;
         }
         pairs[f + 1] = key;
     }
-
-    for (size_t i = 0; _debug && i < pairs.size(); i++){
-        std::cout << "[" << pairs[i].first << "," << pairs[i].second << "] \n";
+    if (_debug) {
+        for (size_t i = 0; i < pairs.size(); i++)
+            std::cout << "[" << pairs[i].first << "," << pairs[i].second << "] ";
+        std::cout << "\n";
     }
-    std::cout << (_debug ? "\n" : "");
 
-    // Spliting pairs into main and pending chain
-    Container<T, std::allocator<T> > main, pendings;
+    // --- Step 3: Split into main and pending chains ---
+    Container<T, std::allocator<T> > mainChain, pendingsChain;
     typename Container<std::pair<T, T>, std::allocator<std::pair<T, T> > >::iterator it;
-    std::cout << (_debug ? "\nDevided each pair into main and pending chains\n" : "");
-    it = pairs.begin();
-    for (; it != pairs.end(); ++it) {
-        pendings.push_back(it->first);
-        main.push_back(it->second);
+    for (it = pairs.begin(); it != pairs.end(); ++it) {
+        pendingsChain.push_back(it->first);
+        mainChain.push_back(it->second);
     }
 
-    std::cout << (_debug ? "mainChain: \n" : "");
-    for (size_t i = 0; _debug && i < main.size(); i++){
-        std::cout << main[i] << ",";
-    }
-    std::cout << (_debug ? "\n" : "");
-    std::cout << (_debug ? "pendingsChain: \n" : "");
-    for (size_t i = 0; _debug && i < pendings.size(); i++){
-        std::cout << pendings[i] << ",";
-    }
-    std::cout << (_debug ? "\n\n" : "");
+    // Handle odd element
+    if (num % 2 != 0)
+        pendingsChain.push_back(arr[num - 1]);
 
-    // Adding add number to the and of pending
-    if (num % 2 != 0) {
-        pendings.push_back(arr[num - 1]);
+    if (_debug) {
+        std::cout << "\nMain chain: ";
+        for (size_t i = 0; i < mainChain.size(); i++) std::cout << mainChain[i] << ",";
+        std::cout << "\nPendings chain: ";
+        for (size_t i = 0; i < pendingsChain.size(); i++) std::cout << pendingsChain[i] << ",";
+        std::cout << "\n\n";
     }
 
-    // Binary merge inserting sort  
-    std::cout << (_debug ? "binary searching position: \n" : "");
-    for (size_t i = 0; i < pendings.size(); ++i) {
-        T selected = pendings[i];
-        int pos = binarySearch(main, selected, 0, main.size() - 1);
-        main.insert(main.begin() + pos, selected);
-        if (_debug)std::cout  << "element: " << selected << " pos: " << pos << " ==> ";
-        for (size_t i = 0; _debug && i < main.size(); i++)
-            std::cout << main[i] << ",";
-        std::cout << (_debug ? "\n" : "");
+    // --- Step 4: Insert pendings using Jacobsthal order ---
+    std::vector<size_t> jacobSeq = generateJacobsthalSequence(pendingsChain.size());
+    std::vector<bool> inserted(pendingsChain.size(), false);
+
+    if (_debug) std::cout << "Inserting in Jacobsthal order:\n";
+    for (size_t j = 0; j < jacobSeq.size(); ++j) {
+        size_t idx = jacobSeq[j] - 1;
+        if (idx >= pendingsChain.size()) continue;
+        if (inserted[idx]) continue;
+
+        T selected = pendingsChain[idx];
+        int pos = binarySearch(mainChain, selected, 0, mainChain.size() - 1);
+        mainChain.insert(mainChain.begin() + pos, selected);
+        inserted[idx] = true;
+
+        if (_debug) {
+            std::cout << "insert pendings[" << idx << "]=" << selected
+                << " at pos " << pos << " => ";
+            for (size_t k = 0; k < mainChain.size(); k++) std::cout << mainChain[k] << ",";
+            std::cout << "\n";
+        }
     }
 
-    arr.swap(main);
+    // Insert remaining elements not covered by Jacobsthal
+    for (size_t i = 0; i < pendingsChain.size(); ++i) {
+        if (!inserted[i]) {
+            T selected = pendingsChain[i];
+            int pos = binarySearch(mainChain, selected, 0, mainChain.size() - 1);
+            mainChain.insert(mainChain.begin() + pos, selected);
+            inserted[i] = true;
+        }
+    }
+
+    arr.swap(mainChain);
 }
 
 template <typename T, template < typename, typename > class Container>
