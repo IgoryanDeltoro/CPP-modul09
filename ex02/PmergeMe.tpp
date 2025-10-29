@@ -128,7 +128,7 @@ void PmergeMe<T, Container>::handleJucobsthalRecurciveAlgorithm(Container<T, std
         pend.erase(pend.begin() + idx);
 
         if (_debug) {
-            std::cout << "insert pendings[" << idx + 1 << " - 1]=" << selected
+            std::cout << "insert pendings[" << jacobSeq[j] << " - 1]=" << selected
                 << " at pos " << pos << " => ";
             for (size_t k = 0; k < main.size(); k++) std::cout << main[k] << ",";
             std::cout << "\n";
